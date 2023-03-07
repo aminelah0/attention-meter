@@ -2,7 +2,7 @@
 install_env:
 	@pyenv virtualenv 3.10.6 attention-env
 	@pyenv local attention-env
-	@pip --install upgrade
+	@pip install --upgrade pip
 	@pip install ipython
 	@pip install ipykernel
 
