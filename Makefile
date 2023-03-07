@@ -1,7 +1,7 @@
 #################### ENV & PACKAGE ACTIONS ###################
 install_env:
 	@pyenv virtualenv 3.10.6 attention-env
-	@pyenv local <attention-env>
+	@pyenv local attention-env
 	@pip --install upgrade
 	@pip install ipython
 	@pip install ipykernel
