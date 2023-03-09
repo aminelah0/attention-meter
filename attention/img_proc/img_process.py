@@ -46,3 +46,6 @@ def output_face_landmarks(face: np.ndarray, landmarks: mp_landmark.NormalizedLan
     image_annoted = face.copy()
     drawing_utils.draw_landmarks(image_annoted, landmarks)
     return image_annoted
+
+
+
