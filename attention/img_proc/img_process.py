@@ -41,11 +41,18 @@ def output_image_bboxes(image_rgb: np.ndarray, bbox_list):
     return image_annoted
 
 
-def output_face_landmarks(face: np.ndarray, landmarks: mp_landmark.NormalizedLandmarkList):
+def output_face_landmarks(face: np.ndarray, mp_landmarks: mp_landmark.NormalizedLandmarkList):
     '''Takes a face image and returns a copy of the image with the drawing of the landmarks'''
-    image_annoted = face.copy()
-    drawing_utils.draw_landmarks(image_annoted, landmarks)
-    return image_annoted
+    face_annoted = face.copy()
+    drawing_spec = drawing_utils.DrawingSpec(thickness=-1, circle_radius=3, color=(0,255,0))
+    drawing_utils.draw_landmarks(face_annoted, mp_landmarks, landmark_drawing_spec=drawing_spec)
+    return face_annoted
 
 
-
+def output_specific_landmarks(face: np.ndarray, face_landmarks: list[tuple], landmark_idx: list[int]):
+    '''Takes a face image and returns a copy of the image with the drawing of the landmarks listed with (x, y) coordinates'''
+    face_annoted = face.copy()
+    landmark_focus = [face_landmarks[idx] for idx in landmark_idx]
+    for landmark in landmark_focus:
+        cv2.circle(face_annoted, landmark, radius=3, color=(0, 255, 0), thickness=-1)
+    return face_annoted
