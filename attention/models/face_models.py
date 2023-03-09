@@ -1,7 +1,11 @@
 # Import libraries
 from mediapipe.python.solutions import face_detection, face_mesh
 import numpy as np
+<<<<<<< HEAD
 import mediapipe.framework.formats.landmark_pb2 as mp_landmark
+=======
+from mediapipe.framework.formats.landmark_pb2 import NormalizedLandmarkList
+>>>>>>> a2d6cd3a339afd9ff65da080ad63b21a8b12b8d6
 
 
 def detect_face(image_rgb: np.ndarray) -> list[dict]:
@@ -24,7 +28,11 @@ def detect_face(image_rgb: np.ndarray) -> list[dict]:
     return coord_set
 
 
+<<<<<<< HEAD
 def find_landmarks(face: np.ndarray) -> mp_landmark.NormalizedLandmarkList:
+=======
+def find_landmarks(face: np.ndarray) -> NormalizedLandmarkList:
+>>>>>>> a2d6cd3a339afd9ff65da080ad63b21a8b12b8d6
     '''Takes the image of a face and return all landmarks of the face. Returns None if no landmark detected'''
     with face_mesh.FaceMesh(
         static_image_mode=True,
@@ -35,8 +43,16 @@ def find_landmarks(face: np.ndarray) -> mp_landmark.NormalizedLandmarkList:
 
         results = face_meshe.process(face)
 
+<<<<<<< HEAD
         face_landmarks = None
         if results.multi_face_landmarks:
             face_landmarks = results.multi_face_landmarks[0]
 
         return face_landmarks
+=======
+        face_mp_landmarks = None
+        if results.multi_face_landmarks:
+            face_mp_landmarks = results.multi_face_landmarks[0]
+
+        return face_mp_landmarks
+>>>>>>> a2d6cd3a339afd9ff65da080ad63b21a8b12b8d6
