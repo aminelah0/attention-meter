@@ -6,3 +6,9 @@ scipy==1.10.0
 scikit-learn==1.2.1
 streamlit
 requests
+opencv-python
+
+# Trick to install the version of Mediapipe depending on the processor: darwin == Mac, ARM == M1
+mediapipe; platform_system != "Darwin" or platform.machine != "arm64"
+mediapipe-silicon; platform_system == "Darwin" and platform.machine == "arm64"
+protobuf>=3.11,<4
