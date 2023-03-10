@@ -14,7 +14,7 @@ def plot_multi_images(image_list: list[np.ndarray]) -> plt:
 
 
 def plot_crops(crops: list[ImageCrop]):
-    w
+    '''Shows all crops from original image as per how they were split along the axes'''
     n_columns = crops[-1].i_x + 1
     n_rows = crops[-1].i_y + 1
     fig = plt.figure(figsize=(20, 10))

@@ -76,6 +76,7 @@ def detect_eye_directions(face_landmarks: list[tuple], threshold: float = 0.63) 
 
 
 def is_attentive(eye_directions: dict) -> bool:
+    '''Determines if a face is attentive based on the eyes' directions'''
     left_direction = eye_directions['left'][0]
     right_direction = eye_directions['right'][0]
 
