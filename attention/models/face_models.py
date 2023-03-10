@@ -2,6 +2,10 @@
 from mediapipe.python.solutions import face_detection, face_mesh
 import numpy as np
 from mediapipe.framework.formats.landmark_pb2 import NormalizedLandmarkList
+from attention.img_proc.img_process import resize_image
+import face_recognition
+from attention.params import *
+from attention.utils.utilities import distance_coord
 
 
 def detect_face(image_rgb: np.ndarray) -> list[dict]:
@@ -40,3 +44,83 @@ def find_landmarks(face: np.ndarray) -> NormalizedLandmarkList:
             face_mp_landmarks = results.multi_face_landmarks[0]
 
         return face_mp_landmarks
+
+
+def detect_eye_directions(face_landmarks: list[tuple], threshold: float = 0.63) -> dict:
+    '''Determines if each eye is looking straight or sideways --> left eye is considered to look sideways if it looks to the left, otherwise it is said to look straight'''
+    eye_directions = dict()
+
+    #LEFT EYE
+    left_iris_lm = face_landmarks[LEFT_IRIS_CENTER[0]]
+    left_eye_inside_lm = face_landmarks[LEFT_EYE_EDGES[0]]
+    left_eye_outside_lm = face_landmarks[LEFT_EYE_EDGES[1]]
+    left_eye_length = distance_coord(left_eye_outside_lm, left_eye_inside_lm, axis='x')
+    left_iris2inside = distance_coord(left_iris_lm, left_eye_inside_lm, axis='x')
+    left_ratio =  round(left_iris2inside/ left_eye_length, 2)
+
+    eye_directions['left'] = ('sideway' if left_ratio > threshold else 'straight',
+                              left_ratio)
+
+    #RIGHT EYE
+    right_iris_lm = face_landmarks[RIGHT_IRIS_CENTER[0]]
+    right_eye_inside_lm = face_landmarks[RIGHT_EYE_EDGES[1]]
+    right_eye_outside_lm = face_landmarks[RIGHT_EYE_EDGES[0]]
+    right_eye_length = distance_coord(right_eye_outside_lm, right_eye_inside_lm, axis='x')
+    right_iris2inside = distance_coord(right_iris_lm, right_eye_inside_lm, axis='x')
+    right_ratio =  round(right_iris2inside/ right_eye_length, 2)
+
+    eye_directions['right'] = ('sideway' if right_ratio > threshold else 'straight',
+                               right_ratio)
+
+    return eye_directions
+
+
+def is_attentive(eye_directions: dict) -> bool:
+    left_direction = eye_directions['left'][0]
+    right_direction = eye_directions['right'][0]
+
+    return (left_direction == 'straight' and right_direction == 'straight')
+
+
+
+def train_faces(known_faces: list[np.ndarray], known_names: list[str]) -> dict:
+    '''Takes lists of known faces (np array) and corresponding names and returns a dictionary {name: encoding}'''
+    known_encodings = {}
+    for i in range(len(known_faces)):
+        img_enc = face_recognition.face_encodings(known_faces[i])[0]
+        known_encodings[known_names[i]] = img_enc
+
+    return known_encodings
+
+
+def recognize_face(face: np.ndarray, known_encodings: dict) -> dict:
+    '''Takes a face and returns prediction for the person in a dictionary: {"Detected_person": str, "distance": value}'''
+    list_known_encodings = list(known_encodings.values())
+    list_known_names = list(known_encodings.keys())
+
+    # Resize image if too big to save some processing power
+    if face.shape[0] > 500:
+        face = resize_image(face, 500)
+
+    try:
+        face_encoding = face_recognition.face_encodings(face)
+    except:
+        #Re-try to encode face with upscaled image
+        try:
+            face_resized = resize_image(face, 400)
+            face_encoding = face_recognition.face_encodings(face_resized)
+        except:
+            face_encoding = None
+            return ("No Face", np.nan)
+
+    if face_encoding:
+        img_enc = face_encoding[0]
+        # results = face_recognition.compare_faces(list_known_encodings,img_enc)
+        distance = list(face_recognition.face_distance(list_known_encodings,img_enc))
+
+        min_distance = np.amin(distance)
+        min_index = distance.index(min_distance)
+
+        return (list_known_names[min_index], min_distance)
+
+    return ("No Face", np.nan)
