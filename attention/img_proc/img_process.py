@@ -85,7 +85,6 @@ def annotate_iris_attention(face: np.ndarray, face_landmarks: list[tuple], predi
     face_landmarks_resized = resize_landmarks(face_landmarks, ratio)
     h, w = face_annotated.shape[:2]
     eye_height = face_landmarks_resized[LEFT_IRIS_CENTER[0], 1]
-    print(eye_height)
 
     #LEFT EYE PREDICTION
     landmark_idx_left = LEFT_EYE_EDGES  + LEFT_IRIS_CENTER
