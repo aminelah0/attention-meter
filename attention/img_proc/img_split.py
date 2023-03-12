@@ -130,7 +130,7 @@ def bbox_merge(bbox_crop_list: list[list[dict]], intersect_threshold: float = 0.
     # Eliminating duplicates - ##TODO: might find a smarter way to do it
     bbox_list_output = []
     for i in range(len(bbox_list)):
-        if not is_included_bbox(bbox_list[i], bbox_list[i+1:]) and not is_included_bbox(bbox_list[i], bbox_list_output):
+        if not is_included_bbox(bbox_list[i], bbox_list[i+1:], intersect_threshold) and not is_included_bbox(bbox_list[i], bbox_list_output, intersect_threshold):
             bbox_list_output.append(bbox_list[i])
 
     return bbox_list_output
