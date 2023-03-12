@@ -53,7 +53,7 @@ def convert_landmarks(face: np.ndarray, mp_landmarks: NormalizedLandmarkList) ->
 
 def resize_landmarks(landmark_list: list[tuple], ratio):
     '''Takes original list of landmarks (x,y tuples) and resize them as per ratio'''
-    landmark_list_resized = (np.array(landmark_list) * ratio).astype(int)
+    landmark_list_resized = ((np.array(landmark_list) + 1) * ratio - 1).astype(int)
 
     return landmark_list_resized
 
