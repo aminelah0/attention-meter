@@ -27,13 +27,17 @@ def save_image(image_rgb: np.ndarray, image_name: str, output_path: str) -> np.n
 
 def resize_image(image: np.ndarray, width: int) -> tuple[np.ndarray, float]:
     '''Takes an image and resizes it as per the desired width, keeping the width/ height ratio of original image
-    Returns a tuple containing the resized_image as well as the resize_ratio'''
+    Returns a tuple containing the resized_image as well as the resize_ratio
+    Input width = 0 to keep original size'''
     image_copy = image.copy()
-    (h,w) = image.shape[:2]
-    ratio = width/w
-    height = int(h * ratio)
-    image_resized = cv2.resize(image_copy, (width, height))
-    return image_resized, ratio
+    if width == 0:
+        return image_copy, 1
+    else:
+        (h,w) = image.shape[:2]
+        ratio = width/w
+        height = int(h * ratio)
+        image_resized = cv2.resize(image_copy, (width, height))
+        return image_resized, ratio
 
 
 def crop_faces(image_rgb: np.ndarray, bbox_list: list[dict]) -> list[np.ndarray]:
@@ -73,9 +77,9 @@ def annotate_landmarks(face: np.ndarray, face_landmarks: list[tuple], landmark_i
     '''Takes a face image and returns a copy of the image with the drawing of the landmarks listed with (x, y) coordinates'''
     face_annotated, ratio = resize_image(face, 500)
     landmark_focus = [face_landmarks[idx] for idx in landmark_idx]
-    for landmark in landmark_focus:
-        landmark_resized = (int(landmark[0] * ratio), int(landmark[1] * ratio))
-        cv2.circle(face_annotated, landmark_resized, radius=2, color=(0, 255, 0), thickness=-1)
+    landmark_focus_resized = resize_landmarks(landmark_focus, ratio)
+    for landmark in landmark_focus_resized:
+        cv2.circle(face_annotated, landmark, radius=2, color=(0, 255, 0), thickness=-1)
     return face_annotated
 
 
