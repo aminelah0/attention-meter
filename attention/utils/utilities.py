@@ -20,6 +20,24 @@ def load_image_paths(folder_path: str) -> dict[str]:
     return image_paths
 
 
+def extract_video_frames(video_path: str, period_sec: float) -> np.ndarray:
+    '''Loads the video and extracts the frames at a periodic rate'''
+    frames = []
+    video = cv2.VideoCapture(video_path)
+    frame_count = video.get(cv2.CAP_PROP_FRAME_COUNT) # total number of frames in video
+    fps = video.get(cv2.CAP_PROP_FPS) # number of frames per second
+    duration = int(frame_count/fps * 1000) # duration of the video in ms
+
+    for period in range(0, duration, period_sec * 1_000):
+        video.set(cv2.CAP_PROP_POS_MSEC, period)
+        frame = video.read()[1]
+        image_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        frames.append(image_rgb)
+
+    return frames
+
+
+
 def convert_landmarks(face: np.ndarray, mp_landmarks: NormalizedLandmarkList) -> list[tuple]:
     '''Takes the resulting landmarks of a face from the face_mesh process
     and converts them to a list of (x,y) coordinates in the form of a tuple'''
