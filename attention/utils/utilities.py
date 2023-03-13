@@ -29,7 +29,7 @@ def extract_video_frames(video_path: str, period_sec: float, start_sec: float = 
     video = cv2.VideoCapture(video_path)
     frame_count = video.get(cv2.CAP_PROP_FRAME_COUNT) # total number of frames in video
     fps = video.get(cv2.CAP_PROP_FPS) # number of frames per second
-    duration = int(frame_count/fps * 1000) # duration of the video in ms
+    duration = int((frame_count/fps - 1) * 1000) # duration of the video in ms
 
     start = start_sec * 1_000
     end = end_sec * 1_000 if end_sec else duration
