@@ -83,7 +83,11 @@ def annotate_landmarks(face: np.ndarray, face_landmarks: list[tuple], landmark_i
     return face_annotated
 
 
-def annotate_attention(face: np.ndarray, face_landmarks: list[tuple], prediction_left: str, score_left: float, prediction_right: str, score_right: float, prediction_head: str, score_head: float, prediction_attention: str):
+def annotate_attention(face: np.ndarray, face_landmarks: list[tuple],
+                       prediction_left: str, score_left: float, prediction_right: str, score_right: float,
+                       prediction_head_direction: str, score_head_direction: float,
+                       prediction_head_inclination: str, score_head_inclination: float,
+                       prediction_attention: str):
     '''Takes a face image and returns a copy of the image with the drawing of the landmarks listed with (x, y) coordinates + predictions for iris, head and overall attention'''
     face_annotated, ratio = resize_image(face, 500)
     face_landmarks_resized = resize_landmarks(face_landmarks, ratio)
@@ -113,11 +117,21 @@ def annotate_attention(face: np.ndarray, face_landmarks: list[tuple], prediction
     #HEAD PREDICTION
     landmark_idx_nose = NOSE
     face_annotated = annotate_landmarks(face_annotated, face_landmarks_resized, landmark_idx_nose)
-    cv2.putText(face_annotated, f'{prediction_head}',
+    cv2.putText(face_annotated, f'{prediction_head_direction}',
                 (w // 2 - 70, eye_height + 100),
                 fontFace = cv2.FONT_HERSHEY_COMPLEX, fontScale = 0.7, color = (0,225,0))
-    cv2.putText(face_annotated, f'{score_head:.2f}',
+    cv2.putText(face_annotated, f'{score_head_direction:.2f}',
                 (w // 2 - 70, eye_height + 120),
+                fontFace = cv2.FONT_HERSHEY_COMPLEX, fontScale = 0.7, color = (0,255,0))
+
+    ##HEAD INCLINATION
+    landmark_idx_bottom_lip_forehead = BOTTOM_LIP + FOREHEAD_MIDDLE
+    face_annotated = annotate_landmarks(face_annotated, face_landmarks_resized, landmark_idx_bottom_lip_forehead)
+    cv2.putText(face_annotated, f'{prediction_head_inclination}',
+                (w // 2 - 70, eye_height + 180),
+                fontFace = cv2.FONT_HERSHEY_COMPLEX, fontScale = 0.7, color = (0,255,0))
+    cv2.putText(face_annotated, f'{score_head_inclination}',
+                (w // 2 - 70, eye_height + 200),
                 fontFace = cv2.FONT_HERSHEY_COMPLEX, fontScale = 0.7, color = (0,255,0))
 
     ##OVERALL ATTENTION
