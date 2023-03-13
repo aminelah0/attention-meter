@@ -6,6 +6,10 @@ scipy==1.10.0
 scikit-learn==1.2.1
 streamlit
 requests
+opencv-python
+CMake
+dlib
+face_recognition
 protobuf<4,>=3.11
 
 [:platform_system != "Darwin" or platform_machine != "arm64"]
