@@ -150,6 +150,6 @@ def recognize_face(face: np.ndarray, known_encodings: dict) -> dict:
         min_distance = np.amin(distance)
         min_index = distance.index(min_distance)
 
-        return (list_known_names[min_index], min_distance)
+        return (list_known_names[min_index], round(min_distance, 2))
 
     return ("No Face", np.nan)
