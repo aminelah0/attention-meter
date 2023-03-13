@@ -9,8 +9,10 @@ import numpy as np
 
 
 ##################  CONSTANTS  #####################
-LEFT_EYE_EDGES =[362, 263]
-RIGHT_EYE_EDGES =[33, 133]
+NOSE = [1]
+
+LEFT_EYE_EDGES = [362, 263]
+RIGHT_EYE_EDGES = [33, 133]
 
 LEFT_IRIS_CONTOUR = [474, 475, 476, 477]
 RIGHT_IRIS_CONTOUR = [469, 470, 471, 472]
