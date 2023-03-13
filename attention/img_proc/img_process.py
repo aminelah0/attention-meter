@@ -83,8 +83,8 @@ def annotate_landmarks(face: np.ndarray, face_landmarks: list[tuple], landmark_i
     return face_annotated
 
 
-def annotate_iris_attention(face: np.ndarray, face_landmarks: list[tuple], prediction_left: str, score_left: float, prediction_right: str, score_right: float, prediction_attention: str):
-    '''Takes a face image and returns a copy of the image with the drawing of the landmarks listed with (x, y) coordinates'''
+def annotate_attention(face: np.ndarray, face_landmarks: list[tuple], prediction_left: str, score_left: float, prediction_right: str, score_right: float, prediction_head: str, score_head: float, prediction_attention: str):
+    '''Takes a face image and returns a copy of the image with the drawing of the landmarks listed with (x, y) coordinates + predictions for iris, head and overall attention'''
     face_annotated, ratio = resize_image(face, 500)
     face_landmarks_resized = resize_landmarks(face_landmarks, ratio)
     h, w = face_annotated.shape[:2]
@@ -110,9 +110,19 @@ def annotate_iris_attention(face: np.ndarray, face_landmarks: list[tuple], predi
                 (50, eye_height + 70),
                 fontFace = cv2.FONT_HERSHEY_COMPLEX, fontScale = 0.7, color = (0,255,0))
 
+    #HEAD PREDICTION
+    landmark_idx_nose = NOSE
+    face_annotated = annotate_landmarks(face_annotated, face_landmarks_resized, landmark_idx_nose)
+    cv2.putText(face_annotated, f'{prediction_head}',
+                (w // 2 - 70, eye_height + 100),
+                fontFace = cv2.FONT_HERSHEY_COMPLEX, fontScale = 0.7, color = (0,225,0))
+    cv2.putText(face_annotated, f'{score_head:.2f}',
+                (w // 2 - 70, eye_height + 120),
+                fontFace = cv2.FONT_HERSHEY_COMPLEX, fontScale = 0.7, color = (0,255,0))
+
     ##OVERALL ATTENTION
     cv2.putText(face_annotated, f'{prediction_attention}',
-                (w // 2 - 70, eye_height + 100),
+                (w // 2 - 70, eye_height + 150),
                 fontFace = cv2.FONT_HERSHEY_COMPLEX, fontScale = 0.7, color = (0,255,0))
 
 
@@ -125,10 +135,10 @@ def annotate_recognition(face: np.ndarray, prediction_name: str, distance: float
     h, w = face_annotated.shape[:2]
 
     cv2.putText(face_annotated, f'{prediction_name}',
-            (w // 2 - 50 , (3 * w) // 4),
+            (w // 2 - 50 , (3 * h) // 4),
             fontFace = cv2.FONT_HERSHEY_COMPLEX, fontScale = 0.7, color =(0, 255, 0))
 
     cv2.putText(face_annotated, f'distance: {distance:.2f}',
-                (w // 2 - 100 , (3 * w) // 4 + 30),
+                (w // 2 - 100 , (3 * h) // 4 + 30),
                 fontFace = cv2.FONT_HERSHEY_COMPLEX, fontScale = 0.7, color =(0, 255, 0))
     return face_annotated

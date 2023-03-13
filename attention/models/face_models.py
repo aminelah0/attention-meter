@@ -75,13 +75,41 @@ def detect_eye_directions(face_landmarks: list[tuple], threshold: float = 0.63) 
     return eye_directions
 
 
-def is_attentive(eye_directions: dict) -> bool:
+def detect_head_direction(face_landmarks: list[tuple], threshold: float = 0.35) -> tuple:
+    '''Determines the direction of the head based on the distance eye edge/ nose'''
+
+    nose_lm = face_landmarks[NOSE[0]]
+    left_eye_outside_lm = face_landmarks[LEFT_EYE_EDGES[1]]
+    right_eye_outside_lm = face_landmarks[RIGHT_EYE_EDGES[0]]
+    left_eye2nose = distance_coord(left_eye_outside_lm, nose_lm, axis='xy')
+    right_eye2nose = distance_coord(right_eye_outside_lm, nose_lm, axis='xy')
+    left_right_ratio =  round(left_eye2nose/ right_eye2nose, 2)
+
+    if left_right_ratio < 1 - threshold:
+        direction = 'head left'
+    elif left_right_ratio > 1 + threshold:
+        direction = 'head right'
+    else:
+        direction = 'head straight'
+
+    head_direction = (direction, left_right_ratio)
+
+    return head_direction
+
+
+def is_attentive(eye_directions: dict, head_direction: tuple) -> bool:
     '''Determines if a face is attentive based on the eyes' directions'''
-    left_direction = eye_directions['left'][0]
-    right_direction = eye_directions['right'][0]
+    left_eye_direction = eye_directions['left'][0]
+    right_eye_direction = eye_directions['right'][0]
 
-    return (left_direction == 'straight' and right_direction == 'straight')
-
+    if left_eye_direction == 'straight' and right_eye_direction == 'straight' and head_direction[0] == 'head straight':
+        return True
+    elif left_eye_direction == 'sideways' and head_direction[0] == 'head right':
+        return True
+    elif right_eye_direction == 'sideways' and head_direction[0] == 'head left':
+        return True
+    else:
+        return False
 
 
 def train_faces(known_faces: list[np.ndarray], known_names: list[str]) -> dict:
