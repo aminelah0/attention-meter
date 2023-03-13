@@ -125,10 +125,10 @@ def annotate_recognition(face: np.ndarray, prediction_name: str, distance: float
     h, w = face_annotated.shape[:2]
 
     cv2.putText(face_annotated, f'{prediction_name}',
-            (w // 2 - 50 , (3 * w) // 4),
+            (w // 2 - 50 , (3 * h) // 4),
             fontFace = cv2.FONT_HERSHEY_COMPLEX, fontScale = 0.7, color =(0, 255, 0))
 
     cv2.putText(face_annotated, f'distance: {distance:.2f}',
-                (w // 2 - 100 , (3 * w) // 4 + 30),
+                (w // 2 - 100 , (3 * h) // 4 + 30),
                 fontFace = cv2.FONT_HERSHEY_COMPLEX, fontScale = 0.7, color =(0, 255, 0))
     return face_annotated
