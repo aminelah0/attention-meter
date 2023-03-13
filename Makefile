@@ -12,3 +12,13 @@ install_package:
 reinstall_package:
 	@pip uninstall -y attention || :
 	@pip install -e .
+
+reset_frames:
+	@rm -rf attention_data/frames/*
+
+reset_output:
+	@rm -rf attention_data/output_bbox/*
+	@rm -rf attention_data/face_crops/*
+	@rm -rf attention_data/output_mesh/*
+	@rm -rf attention_data/output_attention/*
+	@rm -rf attention_data/output_recognition/*
