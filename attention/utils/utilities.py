@@ -26,7 +26,7 @@ def extract_video_frames(video_path: str, period_sec: float) -> np.ndarray:
     video = cv2.VideoCapture(video_path)
     frame_count = video.get(cv2.CAP_PROP_FRAME_COUNT) # total number of frames in video
     fps = video.get(cv2.CAP_PROP_FPS) # number of frames per second
-    duration = int(frame_count/fps * 1000) # duration of the video in ms
+    duration = int((frame_count/fps - 1) * 1000) # duration of the video in ms
 
     for period in range(0, duration, period_sec * 1_000):
         video.set(cv2.CAP_PROP_POS_MSEC, period)
