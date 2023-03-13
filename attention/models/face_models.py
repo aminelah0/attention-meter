@@ -122,7 +122,7 @@ def train_faces(known_faces: list[np.ndarray], known_names: list[str]) -> dict:
     return known_encodings
 
 
-def recognize_face(face: np.ndarray, known_encodings: dict) -> dict:
+def recognize_face(face: np.ndarray, known_encodings: dict, threshold: float = 0.61) -> dict:
     '''Takes a face and returns prediction for the person in a dictionary: {"Detected_person": str, "distance": value}'''
     list_known_encodings = list(known_encodings.values())
     list_known_names = list(known_encodings.keys())
@@ -149,7 +149,10 @@ def recognize_face(face: np.ndarray, known_encodings: dict) -> dict:
 
         min_distance = np.amin(distance)
         min_index = distance.index(min_distance)
+        prediction_recognition = list_known_names[min_index] if min_distance < threshold else np.nan
+        prediction_distance = round(min_distance, 2)
 
-        return (list_known_names[min_index], round(min_distance, 2))
+
+        return (prediction_recognition, prediction_distance)
 
     return ("No Face", np.nan)
