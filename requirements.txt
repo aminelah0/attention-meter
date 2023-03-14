@@ -10,6 +10,7 @@ opencv-python
 cmake
 dlib
 face_recognition
+plotly
 
 # Trick to install the version of Mediapipe depending on the processor: darwin == Mac, ARM == M1
 mediapipe; platform_system != "Darwin" or platform.machine != "arm64"
