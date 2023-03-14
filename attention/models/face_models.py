@@ -90,7 +90,7 @@ def detect_head_direction(face_landmarks: list[tuple], left_threshold: float = 0
     elif left_right_ratio > 1 + right_threshold:
         direction = 'head right'
     else:
-        direction = 'head straight'
+        direction = 'head centered'
 
     head_direction = (direction, left_right_ratio)
 
@@ -106,11 +106,11 @@ def detect_head_inclination(face_landmarks: list[tuple], down_threshold: float =
     bottomlip_nose_vector = distance_coord(nose, bottomlip, axis='y')
     forhead_bottomlip_ratio = forhead_nose_vector / bottomlip_nose_vector
     if forhead_bottomlip_ratio > down_threshold:
-        direction_up = 'down'
+        direction_up = 'head down'
     elif forhead_bottomlip_ratio < up_threshold:
-        direction_up = 'up'
+        direction_up = 'head up'
     else:
-        direction_up = 'straight'
+        direction_up = 'head level'
 
     head_inclination = (direction_up, round(forhead_bottomlip_ratio, 2))
 
@@ -122,9 +122,9 @@ def is_attentive(eye_directions: dict, head_direction: tuple, head_inclination: 
     left_eye_direction = eye_directions['left'][0]
     right_eye_direction = eye_directions['right'][0]
 
-    if head_inclination[0] == 'down':
+    if head_inclination[0] == 'head down':
         return False
-    elif left_eye_direction == 'straight' and right_eye_direction == 'straight' and head_direction[0] == 'head straight':
+    elif left_eye_direction == 'straight' and right_eye_direction == 'straight' and head_direction[0] == 'head centered':
         return True
     elif left_eye_direction == 'sideways' and head_direction[0] == 'head right':
         return True
@@ -166,7 +166,6 @@ def recognize_face(face: np.ndarray, known_encodings: dict, threshold: float = 0
 
     if face_encoding:
         img_enc = face_encoding[0]
-        # results = face_recognition.compare_faces(list_known_encodings,img_enc)
         distance = list(face_recognition.face_distance(list_known_encodings,img_enc))
 
         min_distance = np.amin(distance)
@@ -174,7 +173,6 @@ def recognize_face(face: np.ndarray, known_encodings: dict, threshold: float = 0
         prediction_recognition = list_known_names[min_index] if min_distance < threshold else np.nan
         prediction_distance = round(min_distance, 2)
 
-
         return (prediction_recognition, prediction_distance)
 
-    return ("No Face", np.nan)
+    return (np.nan, np.nan)
