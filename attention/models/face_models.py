@@ -75,7 +75,7 @@ def detect_eye_directions(face_landmarks: list[tuple], threshold: float = 0.63) 
     return eye_directions
 
 
-def detect_head_direction(face_landmarks: list[tuple], threshold: float = 0.35) -> tuple:
+def detect_head_direction(face_landmarks: list[tuple], left_threshold: float = 0.35, right_threshold: float = 0.35) -> tuple:
     '''Determines the direction of the head based on the distance eye edge/ nose'''
 
     nose_lm = face_landmarks[NOSE[0]]
@@ -85,24 +85,46 @@ def detect_head_direction(face_landmarks: list[tuple], threshold: float = 0.35) 
     right_eye2nose = distance_coord(right_eye_outside_lm, nose_lm, axis='xy')
     left_right_ratio =  round(left_eye2nose/ right_eye2nose, 2)
 
-    if left_right_ratio < 1 - threshold:
+    if left_right_ratio < 1 - left_threshold:
         direction = 'head left'
-    elif left_right_ratio > 1 + threshold:
+    elif left_right_ratio > 1 + right_threshold:
         direction = 'head right'
     else:
-        direction = 'head straight'
+        direction = 'head centered'
 
     head_direction = (direction, left_right_ratio)
 
     return head_direction
 
 
-def is_attentive(eye_directions: dict, head_direction: tuple) -> bool:
+def detect_head_inclination(face_landmarks: list[tuple], down_threshold: float = 1.73, up_threshold: float = 0.8) -> dict:
+    '''Determines subject's head is positioned up or down, or none (i.e. straight)'''
+    forhead= face_landmarks[FOREHEAD_MIDDLE[0]]
+    bottomlip = face_landmarks[BOTTOM_LIP[0]]
+    nose = face_landmarks[NOSE[0]]
+    forhead_nose_vector = distance_coord(forhead, nose, axis='y')
+    bottomlip_nose_vector = distance_coord(nose, bottomlip, axis='y')
+    forhead_bottomlip_ratio = forhead_nose_vector / bottomlip_nose_vector
+    if forhead_bottomlip_ratio > down_threshold:
+        direction_up = 'head down'
+    elif forhead_bottomlip_ratio < up_threshold:
+        direction_up = 'head up'
+    else:
+        direction_up = 'head level'
+
+    head_inclination = (direction_up, round(forhead_bottomlip_ratio, 2))
+
+    return head_inclination
+
+
+def is_attentive(eye_directions: dict, head_direction: tuple, head_inclination: tuple) -> bool:
     '''Determines if a face is attentive based on the eyes' directions'''
     left_eye_direction = eye_directions['left'][0]
     right_eye_direction = eye_directions['right'][0]
 
-    if left_eye_direction == 'straight' and right_eye_direction == 'straight' and head_direction[0] == 'head straight':
+    if head_inclination[0] == 'head down':
+        return False
+    elif left_eye_direction == 'straight' and right_eye_direction == 'straight' and head_direction[0] == 'head centered':
         return True
     elif left_eye_direction == 'sideways' and head_direction[0] == 'head right':
         return True
@@ -122,7 +144,7 @@ def train_faces(known_faces: list[np.ndarray], known_names: list[str]) -> dict:
     return known_encodings
 
 
-def recognize_face(face: np.ndarray, known_encodings: dict) -> dict:
+def recognize_face(face: np.ndarray, known_encodings: dict, threshold: float = 0.61) -> dict:
     '''Takes a face and returns prediction for the person in a dictionary: {"Detected_person": str, "distance": value}'''
     list_known_encodings = list(known_encodings.values())
     list_known_names = list(known_encodings.keys())
@@ -144,12 +166,13 @@ def recognize_face(face: np.ndarray, known_encodings: dict) -> dict:
 
     if face_encoding:
         img_enc = face_encoding[0]
-        # results = face_recognition.compare_faces(list_known_encodings,img_enc)
         distance = list(face_recognition.face_distance(list_known_encodings,img_enc))
 
         min_distance = np.amin(distance)
         min_index = distance.index(min_distance)
+        prediction_recognition = list_known_names[min_index] if min_distance < threshold else np.nan
+        prediction_distance = round(min_distance, 2)
 
-        return (list_known_names[min_index], min_distance)
+        return (prediction_recognition, prediction_distance)
 
-    return ("No Face", np.nan)
+    return (np.nan, np.nan)

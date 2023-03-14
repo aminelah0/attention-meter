@@ -44,12 +44,13 @@ def crop_faces(image_rgb: np.ndarray, bbox_list: list[dict]) -> list[np.ndarray]
     '''Takes the coordinates of the faces detected on an image (bbox coordinates) and returns the cropped faces'''
     faces = []
     for bbox in bbox_list:
-        x1 = bbox["x1"]
-        y1 = bbox["y1"]
-        x2 = bbox["x2"]
-        y2 = bbox["y2"]
-        face = image_rgb[y1:y2, x1:x2]
-        faces.append(face)
+        x1 = max(bbox["x1"], 0)
+        y1 = max(bbox["y1"], 0)
+        x2 = max(bbox["x2"], 0)
+        y2 = max(bbox["y2"], 0)
+        if abs(x1 - x2) * abs(y1 - y2) > 0:
+            face = image_rgb[y1:y2, x1:x2]
+            faces.append(face)
     return faces
 
 
@@ -83,7 +84,11 @@ def annotate_landmarks(face: np.ndarray, face_landmarks: list[tuple], landmark_i
     return face_annotated
 
 
-def annotate_attention(face: np.ndarray, face_landmarks: list[tuple], prediction_left: str, score_left: float, prediction_right: str, score_right: float, prediction_head: str, score_head: float, prediction_attention: str):
+def annotate_attention(face: np.ndarray, face_landmarks: list[tuple],
+                       prediction_left_eye: str, score_left_eye: float, prediction_right_eye: str, score_right_eye: float,
+                       prediction_head_direction: str, score_head_direction: float,
+                       prediction_head_inclination: str, score_head_inclination: float,
+                       prediction_attention: str):
     '''Takes a face image and returns a copy of the image with the drawing of the landmarks listed with (x, y) coordinates + predictions for iris, head and overall attention'''
     face_annotated, ratio = resize_image(face, 500)
     face_landmarks_resized = resize_landmarks(face_landmarks, ratio)
@@ -91,39 +96,49 @@ def annotate_attention(face: np.ndarray, face_landmarks: list[tuple], prediction
     eye_height = face_landmarks_resized[LEFT_IRIS_CENTER[0], 1]
 
     #LEFT EYE PREDICTION
-    landmark_idx_left = LEFT_EYE_EDGES  + LEFT_IRIS_CENTER
-    face_annotated = annotate_landmarks(face_annotated, face_landmarks_resized, landmark_idx_left)
-    cv2.putText(face_annotated, f'{prediction_left}',
+    landmark_idx_left_eye = LEFT_EYE_EDGES  + LEFT_IRIS_CENTER
+    face_annotated = annotate_landmarks(face_annotated, face_landmarks_resized, landmark_idx_left_eye)
+    cv2.putText(face_annotated, f'{prediction_left_eye}',
                 (w // 2 + 50, eye_height + 50),
                 fontFace = cv2.FONT_HERSHEY_COMPLEX, fontScale = 0.7, color = (0,225,0))
-    cv2.putText(face_annotated, f'{score_left:.2f}',
+    cv2.putText(face_annotated, f'{score_left_eye:.2f}',
                 (w // 2 + 50, eye_height + 70),
                 fontFace = cv2.FONT_HERSHEY_COMPLEX, fontScale = 0.7, color = (0,255,0))
 
     #RIGHT EYE PREDICTION
     landmark_idx_right = RIGHT_EYE_EDGES  + RIGHT_IRIS_CENTER
     face_annotated = annotate_landmarks(face_annotated, face_landmarks_resized, landmark_idx_right)
-    cv2.putText(face_annotated, f'{prediction_right}',
+    cv2.putText(face_annotated, f'{prediction_right_eye}',
                 (50, eye_height + 50),
                 fontFace = cv2.FONT_HERSHEY_COMPLEX, fontScale = 0.7, color = (0,225,0))
-    cv2.putText(face_annotated, f'{score_right:.2f}',
+    cv2.putText(face_annotated, f'{score_right_eye:.2f}',
                 (50, eye_height + 70),
                 fontFace = cv2.FONT_HERSHEY_COMPLEX, fontScale = 0.7, color = (0,255,0))
 
-    #HEAD PREDICTION
+    #HEAD DIRECTION
     landmark_idx_nose = NOSE
     face_annotated = annotate_landmarks(face_annotated, face_landmarks_resized, landmark_idx_nose)
-    cv2.putText(face_annotated, f'{prediction_head}',
-                (w // 2 - 70, eye_height + 100),
+    cv2.putText(face_annotated, f'{prediction_head_direction}',
+                (w // 4 - 70, eye_height + 120),
                 fontFace = cv2.FONT_HERSHEY_COMPLEX, fontScale = 0.7, color = (0,225,0))
-    cv2.putText(face_annotated, f'{score_head:.2f}',
-                (w // 2 - 70, eye_height + 120),
+    cv2.putText(face_annotated, f'{score_head_direction:.2f}',
+                (w // 4 - 70, eye_height + 140),
+                fontFace = cv2.FONT_HERSHEY_COMPLEX, fontScale = 0.7, color = (0,255,0))
+
+    ##HEAD INCLINATION
+    landmark_idx_bottom_lip_forehead = BOTTOM_LIP + FOREHEAD_MIDDLE
+    face_annotated = annotate_landmarks(face_annotated, face_landmarks_resized, landmark_idx_bottom_lip_forehead)
+    cv2.putText(face_annotated, f'{prediction_head_inclination}',
+                (w // 4 - 70, eye_height + 190),
+                fontFace = cv2.FONT_HERSHEY_COMPLEX, fontScale = 0.7, color = (0,255,0))
+    cv2.putText(face_annotated, f'{score_head_inclination}',
+                (w // 4 - 70, eye_height + 210),
                 fontFace = cv2.FONT_HERSHEY_COMPLEX, fontScale = 0.7, color = (0,255,0))
 
     ##OVERALL ATTENTION
     cv2.putText(face_annotated, f'{prediction_attention}',
-                (w // 2 - 70, eye_height + 150),
-                fontFace = cv2.FONT_HERSHEY_COMPLEX, fontScale = 0.7, color = (0,255,0))
+                (w // 2 - 70, eye_height + 250),
+                fontFace = cv2.FONT_HERSHEY_COMPLEX, fontScale = 0.9, color = (255,45,0))
 
 
     return face_annotated
