@@ -2,6 +2,12 @@ import os
 import numpy as np
 import cv2
 from mediapipe.framework.formats.landmark_pb2 import NormalizedLandmarkList, NormalizedLandmark
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import copy
+import plotly.express as px
+import nbformat
 
 
 def load_image_paths(folder_path: str) -> dict[str]:
@@ -77,3 +83,20 @@ def distance_coord(coord1: tuple, coord2: tuple, axis: str ='x') -> int:
         return y
     else:
         return np.sqrt(x**2 + y**2)
+
+
+def reframe_dataframe(df:pd.DataFrame, video_start:int)-> pd.DataFrame:
+    '''Reframes the dataframe to have axis in seconds and percentage'''
+    df = df.reset_index()
+    df["seconds"] = df['timestamp']/10 - video_start
+    df["percentage"] = df['attentive']*100
+    return df
+
+def plot_attention_curve(df:pd.DataFrame, video_start:int)-> plotly.fig:
+    df = df.groupby('timestamp')[['attentive']].mean()
+    df = df.rolling(window=10).mean().dropna()
+    df = reframe_dataframe(df, video_start)
+    fig = px.line(df, x="seconds", y="percentage", labels = dict(percentage = "Attentiveness (in %)", seconds = "Time (in seconds)"))
+    fig.update_layout(yaxis_range=[0,100])
+    fig.update_layout(xaxis_range=[0,150])
+    return fig
