@@ -117,21 +117,24 @@ def detect_head_inclination(face_landmarks: list[tuple], down_threshold: float =
     return head_inclination
 
 
-def is_attentive(eye_directions: dict, head_direction: tuple, head_inclination: tuple) -> bool:
-    '''Determines if a face is attentive based on the eyes' directions'''
+def is_attentive(eye_directions: dict, head_direction: tuple, head_inclination: tuple) -> tuple[bool, str]:
+    '''Determines if a face is attentive based on the eyes direction and head direction/inclination
+    Returns a tuple (attention_bool, driver of attention):
+    -- "HD": head down
+    -- "EM": Eyes & head Mismatch'''
     left_eye_direction = eye_directions['left'][0]
     right_eye_direction = eye_directions['right'][0]
 
     if head_inclination[0] == 'head down':
-        return False
+        return False, 'HD'
     elif left_eye_direction == 'straight' and right_eye_direction == 'straight' and head_direction[0] == 'head centered':
-        return True
+        return True, ''
     elif left_eye_direction == 'sideways' and head_direction[0] == 'head right':
-        return True
+        return True, ''
     elif right_eye_direction == 'sideways' and head_direction[0] == 'head left':
-        return True
+        return True,''
     else:
-        return False
+        return False, 'EM'
 
 
 def train_faces(known_faces: list[np.ndarray], known_names: list[str]) -> dict:

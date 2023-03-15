@@ -157,3 +157,24 @@ def annotate_recognition(face: np.ndarray, prediction_name: str, distance: float
                 (w // 2 - 100 , (3 * h) // 4 + 30),
                 fontFace = cv2.FONT_HERSHEY_COMPLEX, fontScale = 0.7, color =(0, 255, 0))
     return face_annotated
+
+
+def annotate_summary(image_summary: np.ndarray, bbox_face: dict,
+                     attention: bool, attention_driver: str,
+                     recognition: bool):
+    '''Generates final output with bboxes on all detected faces with indication of their attention and recognition:
+    -- attention: green box if attentive, yellow box if inattentive
+    -- recognition: thick line if recognized, thin if not recognized'''
+
+    x1 = max(bbox_face["x1"], 0)
+    y1 = max(bbox_face["y1"], 0)
+    x2 = max(bbox_face["x2"], 0)
+    y2 = max(bbox_face["y2"], 0)
+
+    color = (0, 255, 0) if attention else (255, 255, 0)
+    thickness = 4 if recognition else 1
+    cv2.rectangle(image_summary, (x1, y1), (x2, y2), color, thickness)
+    cv2.putText(image_summary, attention_driver,
+                (x1, y1 - 10),
+                fontFace = cv2.FONT_HERSHEY_COMPLEX, fontScale = 0.7, color =(255, 255, 0))
+    return image_summary
