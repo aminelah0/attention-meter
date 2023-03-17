@@ -10,9 +10,9 @@ def load_image_paths(folder_path: str) -> dict[str]:
     -- file_path'''
     image_paths = dict()
     image_extension = ['jpeg', 'jpg', 'png']
-    for file in sorted(os.listdir(folder_path)):
+    for file in os.listdir(folder_path):
         if file.find('.') != -1:
-            file_extension = file.split('.')[1]
+            file_extension = file.split('.')[1].lower()
             if file_extension in image_extension:
                 file_path = os.path.join(folder_path,file)
                 file_name = file.split('.')[0]

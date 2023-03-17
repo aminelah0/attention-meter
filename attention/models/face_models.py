@@ -46,8 +46,13 @@ def find_landmarks(face: np.ndarray) -> NormalizedLandmarkList:
         return face_mp_landmarks
 
 
-def detect_eye_directions(face_landmarks: list[tuple], threshold: float = 0.63) -> dict:
-    '''Determines if each eye is looking straight or sideways --> left eye is considered to look sideways if it looks to the left, otherwise it is said to look straight'''
+def detect_eye_directions(face_landmarks: list[tuple],
+                          extreme_threshold: float = 0.63,
+                          detailed_threshold_main: float = 0.6, detailed_threshold_comp: float = 0.45) -> dict:
+    '''Determines if each eye is looking straight or sideways --> left eye is considered to look sideways if it looks to the left, otherwise it is said to look straight
+    Thresholds:
+    -- extreme_threshold: example: if right eye exceeds the threshold, right eye is said to be looking sideways
+    -- detailed_thresholds: example: if right eye exceeds the threshold_main while left_eye is below threshold_comp (for complementary), right eye is said to be looking sideways'''
     eye_directions = dict()
 
     #LEFT EYE
@@ -58,9 +63,6 @@ def detect_eye_directions(face_landmarks: list[tuple], threshold: float = 0.63) 
     left_iris2inside = distance_coord(left_iris_lm, left_eye_inside_lm, axis='x')
     left_ratio =  round(left_iris2inside/ left_eye_length, 2)
 
-    eye_directions['left'] = ('sideway' if left_ratio > threshold else 'straight',
-                              left_ratio)
-
     #RIGHT EYE
     right_iris_lm = face_landmarks[RIGHT_IRIS_CENTER[0]]
     right_eye_inside_lm = face_landmarks[RIGHT_EYE_EDGES[1]]
@@ -69,10 +71,54 @@ def detect_eye_directions(face_landmarks: list[tuple], threshold: float = 0.63) 
     right_iris2inside = distance_coord(right_iris_lm, right_eye_inside_lm, axis='x')
     right_ratio =  round(right_iris2inside/ right_eye_length, 2)
 
-    eye_directions['right'] = ('sideway' if right_ratio > threshold else 'straight',
-                               right_ratio)
+
+    if (left_ratio > extreme_threshold or
+        (left_ratio > detailed_threshold_main and right_ratio < detailed_threshold_comp)):
+        prediction_lefteye_direction = 'sideways'
+    else:
+        prediction_lefteye_direction = 'straight'
+
+    if (right_ratio > extreme_threshold or
+        (right_ratio > detailed_threshold_main and left_ratio < detailed_threshold_comp)):
+        prediction_righteye_direction = 'sideways'
+    else:
+        prediction_righteye_direction = 'straight'
+
+    eye_directions['left'] = (prediction_lefteye_direction, left_ratio)
+    eye_directions['right'] = (prediction_righteye_direction, right_ratio)
 
     return eye_directions
+
+
+def detect_eye_inclinations(face_landmarks: list[tuple], threshold: float = 0.23) -> dict:
+    '''Determines subject's head is positioned up or down, or none (i.e. straight)'''
+
+    eye_inclinations = dict()
+
+    #LEFT EYE
+    left_eye_inside_lm = face_landmarks[LEFT_EYE_EDGES[0]]
+    left_eye_outside_lm = face_landmarks[LEFT_EYE_EDGES[1]]
+    left_eye_length = distance_coord(left_eye_outside_lm, left_eye_inside_lm, axis='xy')
+    left_eye_up_lm = face_landmarks[LEFT_EYE_INT[0]]
+    left_eye_down_lm = face_landmarks[LEFT_EYE_INT[1]]
+    left_eye_height = distance_coord(left_eye_up_lm, left_eye_down_lm, axis='xy')
+    left_ratio =  round(left_eye_height/ left_eye_length, 2)
+
+    eye_inclinations['left'] = ('closed' if left_ratio < threshold else 'open',
+                              left_ratio)
+    #RIGHT EYE
+    right_eye_inside_lm = face_landmarks[RIGHT_EYE_EDGES[0]]
+    right_eye_outside_lm = face_landmarks[RIGHT_EYE_EDGES[1]]
+    right_eye_length = distance_coord(right_eye_outside_lm, right_eye_inside_lm, axis='xy')
+    right_eye_up_lm = face_landmarks[RIGHT_EYE_INT[0]]
+    right_eye_down_lm = face_landmarks[RIGHT_EYE_INT[1]]
+    right_eye_height = distance_coord(right_eye_up_lm, right_eye_down_lm, axis='xy')
+    right_ratio =  round(right_eye_height/ right_eye_length, 2)
+
+    eye_inclinations['right'] = ('closed' if right_ratio < threshold else 'open',
+                              right_ratio)
+
+    return eye_inclinations
 
 
 def detect_head_direction(face_landmarks: list[tuple], left_threshold: float = 0.35, right_threshold: float = 0.35) -> tuple:
@@ -97,7 +143,7 @@ def detect_head_direction(face_landmarks: list[tuple], left_threshold: float = 0
     return head_direction
 
 
-def detect_head_inclination(face_landmarks: list[tuple], down_threshold: float = 1.73, up_threshold: float = 0.8) -> dict:
+def detect_head_inclination(face_landmarks: list[tuple], down_threshold: float = 2.3, up_threshold: float = 0.8) -> dict:
     '''Determines subject's head is positioned up or down, or none (i.e. straight)'''
     forhead= face_landmarks[FOREHEAD_MIDDLE[0]]
     bottomlip = face_landmarks[BOTTOM_LIP[0]]
@@ -117,14 +163,18 @@ def detect_head_inclination(face_landmarks: list[tuple], down_threshold: float =
     return head_inclination
 
 
-def is_attentive(eye_directions: dict, head_direction: tuple, head_inclination: tuple) -> tuple[bool, str]:
+def is_attentive(eye_directions: dict, eye_inclinations:dict, head_direction: tuple, head_inclination: tuple) -> tuple[bool, str]:
     '''Determines if a face is attentive based on the eyes direction and head direction/inclination
     Returns a tuple (attention_bool, driver of attention):
     -- "HD": head down
     -- "EM": Eyes & head Mismatch'''
     left_eye_direction = eye_directions['left'][0]
     right_eye_direction = eye_directions['right'][0]
+    left_eye_inclination = eye_inclinations['left'][0]
+    right_eye_inclination = eye_inclinations['right'][0]
 
+    if left_eye_inclination == 'closed' or right_eye_inclination == 'closed':
+        return False, 'ED'
     if head_inclination[0] == 'head down':
         return False, 'HD'
     elif left_eye_direction == 'straight' and right_eye_direction == 'straight' and head_direction[0] == 'head centered':
