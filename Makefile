@@ -24,6 +24,7 @@ reset_output:
 	@rm -rf attention_data/output_recognition/*
 	@rm -rf attention_data/output_summary/*
 	@rm -rf attention_data/demo/*
+	@rm -rf attention_data/attention_output.csv
 
 
 reset_frames_test:

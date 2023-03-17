@@ -193,10 +193,10 @@ def annotate_summary(image_summary: np.ndarray, ratio,
     x2 = int(bbox_face["x2"] * ratio)
     y2 = int(bbox_face["y2"] * ratio)
 
-    color = (0, 255, 0) if attention else (255, 255, 0)
-    thickness = 4 if recognition else 1
+    color = (0, 255, 0) if attention else (255, 0, 0)
+    thickness = 4 if recognition else 2
     cv2.rectangle(image_summary, (x1, y1), (x2, y2), color, thickness)
     cv2.putText(image_summary, attention_driver,
                 (x1, y1 - 10),
-                fontFace = cv2.FONT_HERSHEY_COMPLEX, fontScale = 0.7, color =(255, 255, 0))
+                fontFace = cv2.FONT_HERSHEY_COMPLEX, fontScale = 0.7, color =(192, 0, 0))
     return image_summary
