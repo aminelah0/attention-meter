@@ -43,6 +43,8 @@ The Attention Meter uses a 3-step approach to measure the attention of an audien
 
 3. **Face ratios calculations:** We perform geometry-based calculations on the face landmarks. Calculating ratios and using experience-based thresholds we can determine if someone is looking at the presentation or not. For example, we can use the ratio $distance\ iris-eye_edge / eye_length$ to infer if someone is looking straight or is looking sideways.
 
+![Step 3: Illustration](images/illustration.png)
+
 In addition to it, we run a face recognition model (from Adam Geitgey) in order to inidividualize the attention results to each known person in the audience.
 
 The output of the Attention Meter project is a dataframe that holds the prediction result (i.e., whether someone is attentive or not) and the results of all relevant calculated ratios for each face detected by the model, frame by frame.
