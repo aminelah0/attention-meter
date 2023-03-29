@@ -76,6 +76,7 @@ There are several potential developments for the Attention Meter project, includ
 ### Requirements
 
 - Python 3.10.6+
+- Pyenv and pyev-virtualenv extension (for automatic creation of project environment with Make command - not critical)
 
 ### Installation
 
