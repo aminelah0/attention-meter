@@ -41,7 +41,7 @@ The Attention Meter uses a 3-step approach to measure the attention of an audien
 
 2. **Landmark detection:** On each face, the Mediapipe facemesh model is used to detect face landmarks (478 landmarks, including iris).
 
-3. **Face ratios calculations:** We perform geometry-based calculations on the face landmarks. Calculating ratios and using experience-based thresholds we can determine if someone is looking at the presentation or not. For example, we can use the ratio $distance\ iris-eye_edge / eye_length$ to infer if someone is looking straight or is looking sideways.
+3. **Face ratios calculations:** We perform geometry-based calculations on the face landmarks. Calculating ratios and using experience-based thresholds we can determine if someone is looking at the presentation or not. For example, we can use the ratio $distance\ iris-eye\_edge / eye\_length$ to infer if someone is looking straight or is looking sideways.
 
 ![Step 3: Illustration](images/illustration.png)
 
