@@ -121,4 +121,4 @@ There are several potential developments for the Attention Meter project, includ
 
 ## Video of Final Project Presentation
 
-For more information, please refer to our project presentation video: <video_link>
+For more information, please refer to our project presentation video: https://youtu.be/MS5pu9YHVzk
