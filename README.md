@@ -88,16 +88,16 @@ There are several potential developments for the Attention Meter project, includ
 ### Repo structure
 
 ```bash
-├── Makefile									# Main project interface: prepare the environment, manage data sources and run the complete workflow
+├── Makefile							# Main project interface: prepare the environment, manage data sources and run the complete workflow
 ├── README.md
 ├── requirements.txt
 ├── setup.py
-├── attention									# Contains the entire code logic for this package
+├── attention							# Contains the entire code logic for this package
 │   └── interface
 │       ├── __init__.py
 │       └── main_local.py			# Packages the key methods to run the overall workflow: from video to frame encoding to generating the outputs
 │   ├── models
-│   │   └── face_models.py  	# Contains all the logic for face and landmarks detection as well as resulting attention measurement; also contains the methods enabling face recognition
+│   │   └── face_models.py  	   # Contains all the logic for face and landmarks detection as well as resulting attention measurement; also contains the methods enabling face recognition
 │   ├── img_proc
 │   │   ├── __init__.py
 │   │   ├── img_annot.py			# Set of functions to show the results of each image processing step directly on the image (for checking the outputs and finetuning the models)
@@ -107,13 +107,13 @@ There are several potential developments for the Attention Meter project, includ
 │   │   ├── __init__.py
 │   │   └── img_vid_utils.py		# Set of utilities for video and image manipulation
 │   │   ├── dataframe_utils.py	# Set of utilities for output dataframe processing
-│   │   ├── img_plot.py					# Image plotting functions
-│   ├── params.py								# Contains global variables: directory path logic, Mediapipe face_mesh landmarks indices, image split parameters, output dataframe skeleton
-├── attention_data							# Directory for storing input video/frames and software outputs
+│   │   ├── img_plot.py				# Image plotting functions
+│   ├── params.py						# Contains global variables: directory path logic, Mediapipe face_mesh landmarks indices, image split parameters, output dataframe skeleton
+├── attention_data					# Directory for storing input video/frames and software outputs
 │   ├── 00_inputs
 │   └── 99_outputs
 └── notebooks
-    ├── 00_workflow.ipynb				# Notebook detailing the complete software workflow
+    ├── 00_workflow.ipynb			# Notebook detailing the complete software workflow
     └── 01_img_split.ipynb			# Notebook showcasing how the image split feature works
 ```
 
