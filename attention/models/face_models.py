@@ -1,11 +1,10 @@
-# Import libraries
-from mediapipe.python.solutions import face_detection, face_mesh
 import numpy as np
+from mediapipe.python.solutions import face_detection, face_mesh
 from mediapipe.framework.formats.landmark_pb2 import NormalizedLandmarkList
-from attention.img_proc.img_process import resize_image
 import face_recognition
+from attention.img_proc.img_annot import resize_image
+from attention.img_proc.landmark_manip import distance_coord
 from attention.params import *
-from attention.utils.utilities import distance_coord
 
 
 def detect_face(image_rgb: np.ndarray) -> list[dict]:
@@ -91,7 +90,7 @@ def detect_eye_directions(face_landmarks: list[tuple],
 
 
 def detect_eye_inclinations(face_landmarks: list[tuple], threshold: float = 0.23) -> dict:
-    '''Determines subject's head is positioned up or down, or none (i.e. straight)'''
+    '''Determines subject's eyes are open or closed'''
 
     eye_inclinations = dict()
 
@@ -144,7 +143,7 @@ def detect_head_direction(face_landmarks: list[tuple], left_threshold: float = 0
 
 
 def detect_head_inclination(face_landmarks: list[tuple], down_threshold: float = 2.3, up_threshold: float = 0.8) -> dict:
-    '''Determines subject's head is positioned up or down, or none (i.e. straight)'''
+    '''Determines subject's head is positioned up or down, or level'''
     forhead= face_landmarks[FOREHEAD_MIDDLE[0]]
     bottomlip = face_landmarks[BOTTOM_LIP[0]]
     nose = face_landmarks[NOSE[0]]

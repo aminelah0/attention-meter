@@ -1,5 +1,3 @@
-#Importing libraries
-import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 from attention.img_proc.img_split import ImageCrop
@@ -19,6 +17,6 @@ def plot_crops(crops: list[ImageCrop]):
     n_rows = crops[-1].i_y + 1
     fig = plt.figure(figsize=(20, 10))
     for i, crop in enumerate(crops):
-        plt.subplot(n_columns, n_rows, i+1)
+        plt.subplot(n_rows, n_columns, i+1)
         plt.imshow(crop.image)
     return plt.show()
