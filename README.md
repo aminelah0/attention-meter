@@ -1,6 +1,6 @@
 # The Attention Meter Project
 
-The Attention Meter project is a data science project that was developed during a 2-weeks summer bootcamp at Le Wagon. The project utilizes pre-trained computer vision models to analyze facial attributes of an audience during a presentation, in order to measure their attention and engagement. By doing so, the Attention Meter project enables you to identify the strengths and weaknesses of your presentation flow.
+The Attention Meter project is a data science project that was developed over a period of 2 weeks as part of a nine-week summer bootcamp at Le Wagon. The project utilizes pre-trained computer vision models to analyze facial attributes of an audience during a presentation, in order to measure their attention and engagement. By doing so, the Attention Meter project enables you to identify the strengths and weaknesses of your presentation flow.
 
 
 
